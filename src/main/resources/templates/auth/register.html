@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+   <link href="/css/auth.css" rel="stylesheet">
+  <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+  
+  <script src="/jquery/dist/jquery.min.js" ></script>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js" ></script>
+  <script src="/bootstrap/js/bootstrap.min.js" ></script>
+
+</head>
+<body>
+<section class="h-100 bg-light">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col">
+                <div class="card card-registration my-4">
+                    <div class="row g-0">
+                        <div class="col-xl-6 d-none d-xl-block">
+                            <img src="/image/register.webp"
+                                 alt="Sample photo" class="img-fluid"
+                                 style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;" />
+                        </div>
+                        <div class="col-xl-6">
+                            <form id="registerForm" class="needs-validation" novalidate th:action="@{/auth/register}" th:method="post" th:object="${registerRequest}" >
+                                <a style="padding-left:50px" th:href="@{/auth/login}"  class="link-info">Login</a></p>
+                                <div class="card-body p-md-5 text-black">
+                                    <h3 class="mb-5 text-uppercase">Online Voting registration form</h3>
+                                    <div th:if="${message}" style="background-color:#acccaa">
+                                        <h4 style="text-align: center;color: #0b4109; padding: 5px;" th:text=${message}></h4>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="firstname">First name</label>
+                                        <input type="text" id="firstname"  th:field="*{firstname}" class="form-control form-control-lg" required />
+                                        <div class="invalid-feedback">First name is required.</div>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="lastname">Last name</label>
+                                        <input type="text" id="lastname" th:field="*{lastname}" class="form-control form-control-lg" required/>
+                                        <div class="invalid-feedback">Last name is required.</div>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="email">Email</label>
+                                        <input type="email" id="email" th:field="*{email}" class="form-control form-control-lg" required/>
+                                        <div class="invalid-feedback">Email is required.</div>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="nic">NIC</label>
+                                        <input type="text" id="nic" th:field="*{nic}" class="form-control form-control-lg" required/>
+                                        <div class="invalid-feedback">NIC is required.</div>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="password">Password</label>
+                                        <input type="password" id="password" th:field="*{password}" class="form-control form-control-lg" required/>
+                                        <div class="invalid-feedback">Password is required.</div>
+                                    </div>
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label" for="confirmPassword">Confirm Password</label>
+                                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control form-control-lg" required/>
+                                        <div class="invalid-feedback">Confirm Password is required.</div>
+                                    </div>
+                                    <div class="d-flex justify-content-end pt-3">
+                                        <button type="reset" id="resetForm" class="btn btn-light btn-lg">Reset all</button>
+                                        <button type="submit" class="btn btn-warning btn-lg ms-2">Submit form</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+
+<script>
+    $(document).ready(function() {
+        'use strict';
+
+        var forms = $('.needs-validation');
+
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if ($('#password').val() !== $('#confirmPassword').val()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $('#confirmPassword').addClass('is-invalid').siblings('.invalid-feedback').text("Passwords don't match.");
+                } else {
+                    $('#confirmPassword').removeClass('is-invalid').siblings('.invalid-feedback').text("");
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+
+</script>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en"-->
+<!--th:replace="~{layout/layout :: layout(~{::section})}">-->
+
+<!--<body>-->
+<!--    <section>-->
+<!--        <p>Page content</p>-->
+<!--        <div>Included on page</div>-->
+<!--    </section>-->
+<!--</body>-->
+<!--</html>-->
+
+<!--<!DOCTYPE html>-->
+<!--<html th:replace="~{layout/layout :: layout(~{::title}, ~{::section})}">-->
+<!--<head>-->
+<!--    <title>Page Title</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<section>-->
+<!--    <p>Page content</p>-->
+<!--    <div>Included on page</div>-->
+<!--</section>-->
+<!--</body>-->
+<!--</html>-->

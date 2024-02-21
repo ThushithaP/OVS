@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="layout(content)"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/auth.css" rel="stylesheet">
+    <link href="/css/modal.css" rel="stylesheet">
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="/bootstrap/font/bootstrap-icons.css" rel="stylesheet" >
+    <link href="/datatable/datatables.min.css" rel="stylesheet">
+
+    <script src="/jquery/dist/jquery.min.js" ></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js" ></script>
+    <script src="/bootstrap/js/bootstrap.min.js" ></script>
+    <script src="/datatable/datatables.min.js" type="text/javascript"></script>
+    <script src="/bootbox/dist/bootbox.min.js" type="text/javascript"></script>
+    <script src="/formvalidation/js/formValidation.popular.min.js" type="text/javascript"></script>
+    <script src="/formvalidation/js/framework/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/datatables/js/dataTables.responsive.min.js" type="text/javascript"></script>
+    <title>OVS</title>
+</head>
+<body>
+    <style>
+        .bi-trash-fill{
+            color: rgb(255, 13, 13);
+        }
+        .bi-pencil-fill{
+            color: rgb(52, 56, 53);
+        }
+        .bi-x-circle-fill{
+            color: rgb(210, 103, 49);
+        }
+        .bi-check-circle-fill{
+            color: rgb(64, 255, 0);
+        }
+
+        .dataTables_filter{
+            margin-bottom: 2rem !important;
+            height: 30px;
+        }
+        .dataTables_filter input{
+            height: 30px;
+        }
+        .dataTables_length label select {
+            height: 30px;
+        }
+
+        .add-btn{
+            background-color: midnightblue;
+            color: white;
+        }
+        .add-btn:hover{
+            color: white;
+        }
+
+        .t-head{
+            background-color: #e8e0ef;
+        }
+
+        .page-section{
+            background-color: #f6effc; 
+            height: 100vh;
+        }
+           
+    </style>
+    <script>
+        function confirmCustomPopup(title, message, buttonType, callback, noAction ) {
+            if (typeof(noAction)==='undefined') noAction = function(){};
+        
+            messageDialog = bootbox.dialog({
+                message: message,
+                title: title,
+                className: "t-modal",
+                buttons: {
+                    danger: {
+                    label: (buttonType == 'Y/N' ? 'No' : 'Cancel'),
+                        className: "t-no-btn btn-sm",
+                        callback: function() {
+                            noAction();
+                            messageDialog.modal('hide');
+                        }
+                    },
+                    main: {
+                        label: (buttonType == 'Y/N' ? 'Yes' : 'OK'),
+                        className: "t-yes-btn btn-sm",
+                        callback: function() {
+                            callback();
+                        }
+                    }
+                }
+            });
+        }
+
+        function sendAjaxRequest(submit_url, params) {
+            $.ajax({
+                type: "POST",
+                url: submit_url,
+                data: params,
+                success: function (response) {
+                    try {
+                        if(response.success) {
+                            // showMessage('success',response.message);
+                            refreshDataTable();
+                        } else if (response.success == false) {
+                            // showMessage('error',response.message);
+                        } else {
+                            // showMessage('error','Unknown error occured.');
+                        }
+                    } catch (e) {
+                        // showMessage('error','Unknown error occured.');
+                    }
+                },
+                error: function (e) {
+                    // showMessage('error','Unknown error occured.');
+                }
+            });
+        }
+
+        function refreshDataTable() {
+            dtTable.fnDraw(true);
+        }
+    </script>
+    <div th:replace="~{component/navbar::navbar}"></div>
+
+    <div th:replace="${content}"></div>
+</body>
+</html>

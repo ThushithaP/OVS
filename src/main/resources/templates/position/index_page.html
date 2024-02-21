@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/layout :: layout(~{::section})}">
+
+<body>
+    <section class="py-3 px-2 page-section">
+        <script>
+            var dtTable
+            var addDialog;
+            var addDialogHTML;
+            var editDialog;
+            var editDialogHTML;
+            $(document).ready(function() {
+                $.fn.dataTable.ext.errMode = 'none';
+                dtTable = $('#dttable').dataTable({
+                    "aoColumns" : [
+                        {"data": "positionName","bSortable" : true},
+                        {"data": "positionStatus","bSortable" : false},
+                        {"data": "action", "bSortable" : false, "render": function (data, type, row) {
+                            return data; 
+                        }},
+                    ],
+                    "processing": true,
+                    "fnDrawCallback" : function() {
+                        
+                    },
+                    "pageLength": 10,
+                    "responsive" : true,
+                    "searching": true,
+                    "bServerSide" : true,
+                    "ajax" : {
+                        "url" : "/position/list",
+                        "data" : function(d) {
+                        },
+                        
+                    }
+                });
+              
+                addDialogHTML = $(".js-add-dialog").html();
+                $(".js-add-dialog").html('');
+                editDialogHTML = $(".js-edit-dialog").html();
+                $(".js-edit-dialog").html('');
+            });
+        
+            function closeAddRecord() {
+                addDialog.modal('hide');
+            }
+        
+            function addRecord() {
+                addDialog = bootbox.dialog({
+                    message: addDialogHTML,
+                    title: "Add Position",
+                    className:"t-modal"
+                })
+                .on("shown.bs.modal", function(e) {
+                    $('#frmAddPosition').formValidation({
+                        fields: {
+                            positionName: {
+                                verbose: false,
+                                validators: {
+                                    notEmpty: {
+                                        message: 'The position name is required.'
+                                    },							
+                                }
+                            },
+                            positionStatus: {
+                                verbose: false,
+                                validators: {
+                                    notEmpty: {
+                                        message: 'The position status is required.'
+                                    },							
+                                }
+                            },
+                                
+                        }
+                    }).on('success.form.fv', function(e) {
+                        e.preventDefault();
+                        var dataString = $("#frmAddPosition").serialize();
+                        $.ajax({
+                            url:'/position/save',
+                            method : 'POST',
+                            data : dataString,
+        
+                            success : function(response) {
+                        		// showMessage('success',response.message);
+                                refreshDataTable();
+                        		closeAddRecord();
+                        		
+                            },
+                            error : function(error) {
+                        		// showMessage('error',error.responseJSON.message);
+                            } 
+                        });                   
+                    });
+                });
+            }
+            
+            function closeEditRecord() {
+                editDialog.modal('hide');
+            }
+
+            function editRecord(id) {
+                editDialog = bootbox.dialog({
+                    message: editDialogHTML,
+                    title: "Edit Position",
+                    className:"t-modal"
+                })
+                .on("shown.bs.modal", function(e) {
+                    $('#frmEditPosition').formValidation({
+                        fields: {
+                            positionName: {
+                                verbose: false,
+                                validators: {
+                                    notEmpty: {
+                                        message: 'The position name is required.'
+                                    },							
+                                }
+                            },
+                            positionStatus: {
+                                verbose: false,
+                                validators: {
+                                    notEmpty: {
+                                        message: 'The position status is required.'
+                                    },							
+                                }
+                            },
+                                
+                        }
+                    }).on('success.form.fv', function(e) {
+                        e.preventDefault();
+                        var dataString = $("#frmEditPosition").serialize();
+                        $.ajax({
+                            url:'/position/update',
+                            method : 'POST',
+                            data : dataString,
+        
+                            success : function(response) {
+                                refreshDataTable();
+                        		// showMessage('success',response.message);
+                        		closeEditRecord();
+                        		
+                            },
+                            error : function(error) {
+                        		// showMessage('error',error.responseJSON.message);
+                            } 
+                        });                   
+                    });
+                });
+
+                $.ajax({
+                    url : '/position/read',
+                    method : 'POST',
+                    data: {'id': id},
+                    success : function (response) {
+                        $('[name="positionName"]').val(response.positionName);
+                        $('[name="positionStatus"]').val(response.positionStatus);
+                        $('[name="encID"]').val(id);
+                    },
+                    error : function (error) {
+
+                    }
+
+                })
+            }
+            
+
+            function inactiveRecord(id,status) {
+                confirmCustomPopup("Inactive", "Are you sure to inactive this position?", 'Y/N', function() {
+                    sendAjaxRequest('/position/status', {
+                        'id': id,
+                        'act': 'inactive',
+                    });
+                });
+            }
+            function activeRecord(id,status) {
+                confirmCustomPopup("Active", "Are you sure to active this position?", 'Y/N', function() {
+                    sendAjaxRequest('/position/status', {
+                        'id': id,
+                        'act': 'active',
+                    });
+                });
+            }
+            function deleteRecord(id,status) {
+                confirmCustomPopup("Delete", "Are you sure to delete this position?", 'Y/N', function() {
+                    sendAjaxRequest('/position/status', {
+                        'id': id,
+                        'act': 'delete',
+                    });
+                });
+            }
+        </script>
+        
+        <div class="row justify-content-between ">
+            <div class="col-auto">
+                <h3 class="m-0">Position</h3>
+            </div>
+            <div class="col-auto">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Position</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <button onclick="addRecord();" type="button" class="ml-2 btn btn-sm mt-4 mb-2 add-btn" data-inline="true" title="Add New Position">
+            <i class="bi bi-plus-circle add-btn pe-2"></i>Add position
+        </button>
+        <p th:text="${username}"></p>
+        <table id="dttable"	class="table table-striped table-hover mt-2" style="width:100%" >
+            <thead class="t-head">
+                <tr>
+                    <th>Position Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                            
+            </tbody>
+        </table>
+
+        <div class="d-none">
+            <div class="js-add-dialog">
+                <form id="frmAddPosition" method="post" action="" class="row form-horizontal">
+                    <div class="col-md-12">
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Position Name</label>
+                            <input class="form-control form-control-sm" name="positionName" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Position Status</label>
+                            <select name="positionStatus"  class="form-control form-control-sm">
+                                <option value="A">Active</option>
+                                <option value="I">Inactive</option>
+                            </select>
+                        </div>		
+                        <div class="row justify-content-end mt-3">
+                            <div class="col-auto">
+                                <div class="form-group foot mb-0">
+                                    <button type="button" class="btn btn-sm mr-1 t-close-btn" onclick="javascript:closeAddRecord()">Close</button>
+                                    <button type="submit" class="btn btn-sm t-save-btn">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="js-edit-dialog">
+                <form id="frmEditPosition" method="post" action="" class="row form-horizontal">
+                    <div class="col-md-12">
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Position Name</label>
+                            <input class="form-control form-control-sm" name="positionName" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Position Status</label>
+                            <select name="positionStatus"  class="form-control form-control-sm">
+                                <option value="A">Active</option>
+                                <option value="I">Inactive</option>
+                            </select>
+                        </div>		
+                        <div class="row justify-content-end mt-3">
+                            <div class="col-auto">
+                                <div class="form-group foot mb-0">
+                                    <input type="hidden" name="encID">
+                                    <button type="button" class="btn btn-sm mr-1 t-close-btn" onclick="javascript:closeEditRecord()">Close</button>
+                                    <button type="submit" class="btn btn-sm t-save-btn">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>        
+    </section>
+</body>
+
+</html>
