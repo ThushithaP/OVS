@@ -30,6 +30,7 @@ public class PositionServiceImpl implements PositionService{
         Position position = new Position();
         position.setPositionName(positionDto.getPositionName());
         position.setPositionStatus(positionDto.getPositionStatus());
+        position.setMaxVote(positionDto.getMaxVote());
         position.setCreatedAt(now);
         position.setCreatedBy(userId);
         positionRepository.save(position);
@@ -49,6 +50,7 @@ public class PositionServiceImpl implements PositionService{
 
             positionDto.setPositionName(position.getPositionName());
             positionDto.setPositionStatus(Objects.requireNonNull(Status.getByCode(position.getPositionStatus())).getValue());
+            positionDto.setMaxVote(position.getMaxVote());
             positionDto.setEncId(AESUtils.encrypt(position.getId()));
             positionDto.setAction(getBtnText(position, positionDto));
 
@@ -95,7 +97,6 @@ public class PositionServiceImpl implements PositionService{
     @Override
     public Optional<Position> read(Integer id) {
         return positionRepository.findById(Long.valueOf(id));
-
     }
 
     @Override
@@ -107,6 +108,7 @@ public class PositionServiceImpl implements PositionService{
             Position position = positionOptional.get();
             position.setPositionName(positionDto.getPositionName());
             position.setPositionStatus(positionDto.getPositionStatus());
+            position.setMaxVote(positionDto.getMaxVote());
             position.setUpdatedBy(userId);
             position.setLmd(now);
             positionRepository.save(position);

@@ -1,10 +1,12 @@
 package com.ovs.VotingSystem.constatnt;
 
+import lombok.Getter;
+
+@Getter
 public enum Status {
     ACTIVE("A","Active"),
     INACTIVE("I", "Inactive"),
     UNKNOWN("U", "Unknown");
-
 
     private final String value;
     private final String code;
@@ -12,14 +14,6 @@ public enum Status {
     Status(String code, String value) {
         this.code = code;
         this.value = value;
-    }
-
-
-    public String getValue() {
-        return value;
-    }
-    public String getCode() {
-        return code;
     }
 
     public static Status getByCode(String code) {

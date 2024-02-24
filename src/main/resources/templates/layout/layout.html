@@ -21,6 +21,7 @@
     <script src="/formvalidation/js/formValidation.popular.min.js" type="text/javascript"></script>
     <script src="/formvalidation/js/framework/bootstrap.min.js" type="text/javascript"></script>
     <script src="/datatables/js/dataTables.responsive.min.js" type="text/javascript"></script>
+    <script src="/sweetalert/js/sweetalert2.all.min.js" type="text/javascript"></script>
     <title>OVS</title>
 </head>
 <body>
@@ -58,11 +59,11 @@
         }
 
         .t-head{
-            background-color: #e8e0ef;
+            background-color: #FFFFD0;
         }
 
         .page-section{
-            background-color: #f6effc; 
+            background-color: #FFFFEC; 
             height: 100vh;
         }
            
@@ -95,34 +96,49 @@
             });
         }
 
-        function sendAjaxRequest(submit_url, params) {
-            $.ajax({
-                type: "POST",
-                url: submit_url,
-                data: params,
-                success: function (response) {
-                    try {
-                        if(response.success) {
-                            // showMessage('success',response.message);
-                            refreshDataTable();
-                        } else if (response.success == false) {
-                            // showMessage('error',response.message);
-                        } else {
-                            // showMessage('error','Unknown error occured.');
-                        }
-                    } catch (e) {
-                        // showMessage('error','Unknown error occured.');
-                    }
-                },
-                error: function (e) {
-                    // showMessage('error','Unknown error occured.');
-                }
+        function showMessage(icon,message) {
+            const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+            });
+            Toast.fire({
+                icon: icon,
+                title: message,
+                showCloseButton: true,
             });
         }
 
         function refreshDataTable() {
             dtTable.fnDraw(true);
         }
+
+        function sendAjaxRequest(submit_url, params) {
+            $.ajax({
+                type: "POST",
+                url: submit_url,
+                data: params,
+                success: function (response) {
+                    try {                  
+                        showMessage('success',response);
+                        refreshDataTable();
+                    } catch (e) {
+                        showMessage('error','Unknown error occured.');
+                    }
+                },
+                error: function (e) {
+                    showMessage('error','Unknown error occured.');
+                }
+            });
+        }
+
+        
     </script>
     <div th:replace="~{component/navbar::navbar}"></div>
 

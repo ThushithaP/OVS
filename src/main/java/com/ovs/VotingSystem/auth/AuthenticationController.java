@@ -37,17 +37,14 @@ public class AuthenticationController {
     @GetMapping("/login")
     public String login(Model model ,HttpServletResponse response) {
         model.addAttribute("loginRequest", new AuthenticateRequest());
-        Cookie cookie = new Cookie("Authorize",null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        jwtService.clearCookie(response);
         return "auth/login";
     }
     @PostMapping("/authenticate")
     public String authenticate( AuthenticateRequest request, HttpServletResponse res, Model model) {
         try{
             AuthenticationResponse response = service.authenticate(request, res);
-            return "redirect:/position/index";
+            return "redirect:/dashboard/index";
 
         } catch (Exception e){
             model.addAttribute("message","Login Failed !.");
@@ -59,6 +56,12 @@ public class AuthenticationController {
     public String signup(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
         return "auth/register";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        jwtService.clearCookie(response);
+        return "redirect:/auth/login";
     }
 }
 

@@ -14,6 +14,7 @@
                 dtTable = $('#dttable').dataTable({
                     "aoColumns" : [
                         {"data": "positionName","bSortable" : true},
+                        {"data": "maxVote","bSortable" : false},
                         {"data": "positionStatus","bSortable" : false},
                         {"data": "action", "bSortable" : false, "render": function (data, type, row) {
                             return data; 
@@ -40,7 +41,39 @@
                 editDialogHTML = $(".js-edit-dialog").html();
                 $(".js-edit-dialog").html('');
             });
-        
+
+            function setValidation(formId) { 
+                $('#'+formId).formValidation({
+                    fields: {
+                        positionName: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The position name is required.'
+                                },							
+                            }
+                        },
+                        positionStatus: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The position status is required.'
+                                },							
+                            }
+                        },
+                        maxVote: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The position status is required.'
+                                },							
+                            }
+                        },
+                            
+                    }
+                })
+            }
+                  
             function closeAddRecord() {
                 addDialog.modal('hide');
             }
@@ -52,42 +85,21 @@
                     className:"t-modal"
                 })
                 .on("shown.bs.modal", function(e) {
-                    $('#frmAddPosition').formValidation({
-                        fields: {
-                            positionName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position name is required.'
-                                    },							
-                                }
-                            },
-                            positionStatus: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position status is required.'
-                                    },							
-                                }
-                            },
-                                
-                        }
-                    }).on('success.form.fv', function(e) {
+                    setValidation('frmAddPosition');
+                    $('#frmAddPosition').on('success.form.fv', function(e) {
                         e.preventDefault();
                         var dataString = $("#frmAddPosition").serialize();
                         $.ajax({
                             url:'/position/save',
                             method : 'POST',
-                            data : dataString,
-        
+                            data : dataString,      
                             success : function(response) {
-                        		// showMessage('success',response.message);
+                        		showMessage('success',response);
                                 refreshDataTable();
-                        		closeAddRecord();
-                        		
+                        		closeAddRecord();                      		
                             },
                             error : function(error) {
-                        		// showMessage('error',error.responseJSON.message);
+                        		showMessage('error',"Unknown error occurred");
                             } 
                         });                   
                     });
@@ -105,42 +117,22 @@
                     className:"t-modal"
                 })
                 .on("shown.bs.modal", function(e) {
-                    $('#frmEditPosition').formValidation({
-                        fields: {
-                            positionName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position name is required.'
-                                    },							
-                                }
-                            },
-                            positionStatus: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position status is required.'
-                                    },							
-                                }
-                            },
-                                
-                        }
-                    }).on('success.form.fv', function(e) {
+                    setValidation('frmEditPosition');
+                    $('#frmEditPosition').on('success.form.fv', function(e) {
                         e.preventDefault();
                         var dataString = $("#frmEditPosition").serialize();
                         $.ajax({
                             url:'/position/update',
                             method : 'POST',
-                            data : dataString,
-        
+                            data : dataString,      
                             success : function(response) {
                                 refreshDataTable();
-                        		// showMessage('success',response.message);
-                        		closeEditRecord();
-                        		
+                        		showMessage('success',response);
+                        		closeEditRecord();                       		
                             },
                             error : function(error) {
-                        		// showMessage('error',error.responseJSON.message);
+                        		showMessage('error',"Unknown Error Occurred");
+                                closeEditRecord();
                             } 
                         });                   
                     });
@@ -153,16 +145,16 @@
                     success : function (response) {
                         $('[name="positionName"]').val(response.positionName);
                         $('[name="positionStatus"]').val(response.positionStatus);
+                        $('[name="maxVote"]').val(response.maxVote);
                         $('[name="encID"]').val(id);
                     },
                     error : function (error) {
 
                     }
 
-                })
+                });
             }
             
-
             function inactiveRecord(id,status) {
                 confirmCustomPopup("Inactive", "Are you sure to inactive this position?", 'Y/N', function() {
                     sendAjaxRequest('/position/status', {
@@ -171,6 +163,7 @@
                     });
                 });
             }
+
             function activeRecord(id,status) {
                 confirmCustomPopup("Active", "Are you sure to active this position?", 'Y/N', function() {
                     sendAjaxRequest('/position/status', {
@@ -179,6 +172,7 @@
                     });
                 });
             }
+            
             function deleteRecord(id,status) {
                 confirmCustomPopup("Delete", "Are you sure to delete this position?", 'Y/N', function() {
                     sendAjaxRequest('/position/status', {
@@ -196,7 +190,7 @@
             <div class="col-auto">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard/index">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Position</li>
                     </ol>
                 </nav>
@@ -210,6 +204,7 @@
             <thead class="t-head">
                 <tr>
                     <th>Position Name</th>
+                    <th>Candidate Max.Vote</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -226,6 +221,10 @@
                         <div class="form-group mb-2">
                             <label class="mb-1 t-main-label">Position Name</label>
                             <input class="form-control form-control-sm" name="positionName" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Candidate Maximum Vote</label>
+                            <input class="form-control form-control-sm" name="maxVote" type="number" autocomplete="off">
                         </div>
                         <div class="form-group mb-2">
                             <label class="mb-1 t-main-label">Position Status</label>
@@ -252,6 +251,10 @@
                         <div class="form-group mb-2">
                             <label class="mb-1 t-main-label">Position Name</label>
                             <input class="form-control form-control-sm" name="positionName" type="text" autocomplete="off">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-1 t-main-label">Candidate Maximum Vote</label>
+                            <input class="form-control form-control-sm" name="maxVote" type="number" autocomplete="off">
                         </div>
                         <div class="form-group mb-2">
                             <label class="mb-1 t-main-label">Position Status</label>

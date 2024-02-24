@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout/layout :: layout(~{::section})}">
+<body>
+    <section class="py-3 px-2 page-section">
+        <style>
+            .t-cheader{
+                background-color: #91D8E4 !important;
+            }
+        </style>
+        <h3>Dashboard</h3>
+        <div class="row mt-4" style="background-color: #FFFFEC;">
+            <h5>Position & Candidate</h5>
+            <div class="mb-4 col-md-12">
+                <div th:each="row : ${candidatesByPositions}" class="card mb-3">
+                    <div class="card-header t-cheader">
+                        <h6 th:text="${row[0]} + ' (' + ${row[2]} + ' Candidates)'">Position</h6>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li th:each="candidate : ${row[1]}" class="list-group-item" th:text="${candidate}">Candidate</li>
+                    </ul>
+                </div>
+            </div>
+            <h5>Voted Updates</h5>
+            <div class="row d-flex" th:if="${votesByPosition}">
+                <div class="col-md-4" th:each="entry : ${votesByPosition}">
+                    <h6 class="card-header t-cheader" th:text="${entry.key}">Position Name</h6>
+                    <table class="table text-center">
+                        <thead>
+                            <th>Candidate Name</th>
+                            <th>Vote Count</th>
+                        </thead>
+                        <tbody>
+                            <tr th:each="candidate : ${entry.value}">
+                                <td th:text="${candidate[0]}">Candidate Name</td>
+                                <td>
+                                    <span th:text="${candidate[1]}">Vote Count</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>

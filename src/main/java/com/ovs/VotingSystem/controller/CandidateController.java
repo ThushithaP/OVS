@@ -35,15 +35,19 @@ public class CandidateController {
     @GetMapping("/index")
     public String index(Model model) throws Exception {
         List<PositionDto> positionList = positionService.getActivePosition();
-        System.out.println(positionList);
         model.addAttribute("positions",positionList);
         return "candidates/index";
     }
 
     @PostMapping("/save")
     public ResponseEntity<String> addCandidate(@Validated CandidateDto candidateDto) throws Exception {
-        candidateService.addCandidate(candidateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Candidate Created Successfully");
+        try {
+            candidateService.addCandidate(candidateDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Candidate Created Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknown error occured.");
+        }
     }
 
     @GetMapping("/list")
@@ -91,7 +95,6 @@ public class CandidateController {
     public ResponseEntity<?> read(HttpServletRequest request) throws Exception {
         try {
             String encId = request.getParameter("id");
-            System.out.println("encId" + encId);
             Integer id = AESUtils.decrypt(encId);
 
             Optional<Candidate> candidateOptional = candidateService.read(id);

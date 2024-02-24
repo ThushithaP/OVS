@@ -46,6 +46,70 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                 editDialogHTML = $(".js-edit-dialog").html();
                 $(".js-edit-dialog").html('');
             });
+
+            function setValidation(formId) {
+                $('#'+formId).formValidation({
+                    fields: {
+                        fullName: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The Full Name name is required.'
+                                },							
+                            }
+                        },
+                        firstName: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The First Name name is required.'
+                                },							
+                            }
+                        },
+                        lastName: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The Last Name name is required.'
+                                },							
+                            }
+                        },
+                        nic: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The NIC is required.'
+                                },							
+                            }
+                        },
+                        dob: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The date of birth is required.'
+                                },							
+                            }
+                        },
+                        mobile: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The Mobile Number is required.'
+                                },							
+                            }
+                        },
+                        positionId: {
+                            verbose: false,
+                            validators: {
+                                notEmpty: {
+                                    message: 'The position is required.'
+                                },							
+                            }
+                        },
+                            
+                    }
+                })
+            }
         
             function closeAddRecord() {
                 addDialog.modal('hide');
@@ -58,82 +122,21 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                     className:"t-modal"
                 })
                 .on("shown.bs.modal", function(e) {
-                    $('#frmAddCandidate').formValidation({
-                        fields: {
-                            fullName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Full Name name is required.'
-                                    },							
-                                }
-                            },
-                            firstName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The First Name name is required.'
-                                    },							
-                                }
-                            },
-                            lastName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Last Name name is required.'
-                                    },							
-                                }
-                            },
-                            nic: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The NIC is required.'
-                                    },							
-                                }
-                            },
-                            dob: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The date of birth is required.'
-                                    },							
-                                }
-                            },
-                            mobile: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Mobile Number is required.'
-                                    },							
-                                }
-                            },
-                            positionId: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position is required.'
-                                    },							
-                                }
-                            },
-                                
-                        }
-                    }).on('success.form.fv', function(e) {
+                    setValidation('frmAddCandidate');
+                    $('#frmAddCandidate').on('success.form.fv', function(e) {
                         e.preventDefault();
                         var dataString = $("#frmAddCandidate").serialize();
                         $.ajax({
                             url:'/candidate/save',
                             method : 'POST',
-                            data : dataString,
-        
+                            data : dataString,       
                             success : function(response) {
-                        		// showMessage('success',response.message);
+                        		showMessage('success',response);
                                 refreshDataTable();
-                        		closeAddRecord();
-                        		
+                        		closeAddRecord();                      		
                             },
                             error : function(error) {
-                        		// showMessage('error',error.responseJSON.message);
+                        		showMessage('error',"Unknown error occurred");
                             } 
                         });                   
                     });
@@ -151,82 +154,21 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                     className:"t-modal"
                 })
                 .on("shown.bs.modal", function(e) {
-                    $('#frmEditCandidate').formValidation({
-                        fields: {
-                            fullName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Full Name name is required.'
-                                    },							
-                                }
-                            },
-                            firstName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The First Name name is required.'
-                                    },							
-                                }
-                            },
-                            lastName: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Last Name name is required.'
-                                    },							
-                                }
-                            },
-                            nic: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The NIC is required.'
-                                    },							
-                                }
-                            },
-                            dob: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The date of birth is required.'
-                                    },							
-                                }
-                            },
-                            mobile: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The Mobile Number is required.'
-                                    },							
-                                }
-                            },
-                            positionId: {
-                                verbose: false,
-                                validators: {
-                                    notEmpty: {
-                                        message: 'The position is required.'
-                                    },							
-                                }
-                            },
-                                
-                        }
-                    }).on('success.form.fv', function(e) {
+                    setValidation('frmEditCandidate');
+                    $('#frmEditCandidate').on('success.form.fv', function(e) {
                         e.preventDefault();
                         var dataString = $("#frmEditCandidate").serialize();
                         $.ajax({
                             url:'/candidate/update',
                             method : 'POST',
-                            data : dataString,
-        
+                            data : dataString,       
                             success : function(response) {
                                 refreshDataTable();
-                        		// showMessage('success',response.message);
-                        		closeEditRecord();
-                        		
+                        		showMessage('success',response);
+                        		closeEditRecord();                        		
                             },
                             error : function(error) {
-                        		// showMessage('error',error.responseJSON.message);
+                        		showMessage('error',"Unknown error occurred");
                             } 
                         });                   
                     });
@@ -248,7 +190,7 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                         $('[name="encID"]').val(id);
                     },
                     error : function (error) {
-
+                        showMessage('error',"Unknown error occurred");
                     }
 
                 });
@@ -263,6 +205,7 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                     });
                 });
             }
+
             function activeRecord(id,status) {
                 confirmCustomPopup("Active", "Are you sure to active this candidate?", 'Y/N', function() {
                     sendAjaxRequest('/candidate/status', {
@@ -271,6 +214,7 @@ th:replace="~{layout/layout :: layout(~{::section})}">
                     });
                 });
             }
+            
             function deleteRecord(id,status) {
                 confirmCustomPopup("Delete", "Are you sure to delete this candidate?", 'Y/N', function() {
                     sendAjaxRequest('/candidate/status', {
@@ -288,7 +232,7 @@ th:replace="~{layout/layout :: layout(~{::section})}">
             <div class="col-auto">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/dashboard/index">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Candidate</li>
                     </ol>
                 </nav>

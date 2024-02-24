@@ -33,8 +33,13 @@ public class PositionController {
 
     @PostMapping("/save")
     public ResponseEntity<String> addPosition(@Validated PositionDto positionDto) {
-        positionService.addPosition(positionDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Position Created Successfully");
+        try {
+            positionService.addPosition(positionDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Position Created Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknown Error Occurred");
+        }
     }
 
     @GetMapping("/list")
@@ -57,14 +62,20 @@ public class PositionController {
         Integer id = AESUtils.decrypt(encId);
         String action = request.getParameter("act");
         String status = null;
-        String message = "Position Updated Successfully";;
-        if(action.equals("active")) {
-            status = "A";
-        } else if (action.equals("inactive")) {
-            status = "I";
-        } else if (action.equals("delete")) {
-            status = "D";
-            message = "Position Deleted Successfully";
+        String message = null;;
+        switch (action) {
+            case "active" -> {
+                status = "A";
+                message = "Position Activated Successfully";
+            }
+            case "inactive" -> {
+                status = "I";
+                message = "Position Inactivated Successfully";
+            }
+            case "delete" -> {
+                status = "D";
+                message = "Position Deleted Successfully";
+            }
         }
 
         try {
@@ -82,7 +93,6 @@ public class PositionController {
     public ResponseEntity<?> read(HttpServletRequest request) throws Exception {
         try {
             String encId = request.getParameter("id");
-            System.out.println("encId" + encId);
             Integer id = AESUtils.decrypt(encId);
 
             Optional<Position> positionOptional = positionService.read(id);

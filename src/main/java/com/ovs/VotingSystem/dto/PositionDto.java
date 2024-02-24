@@ -1,6 +1,7 @@
 package com.ovs.VotingSystem.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,6 @@ public class PositionDto {
     private String positionName;
     @NotBlank
     private String positionStatus;
+    @NotNull
+    private Integer maxVote;
 }

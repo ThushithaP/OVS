@@ -16,6 +16,9 @@ public class Position {
     @Column(name = "status")
     private String positionStatus;
 
+    @Column(name = "max_vote")
+    private Integer maxVote;
+
     @Column(name="created_at")
     private String createdAt;
 
